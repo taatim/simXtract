@@ -804,8 +804,17 @@ body {
 }
 
 @keyframes scan-move {
-    0%, 100% { top: 5%; opacity: 0.5; }
-    50% { top: 90%; opacity: 1; }
+
+    0%,
+    100% {
+        top: 5%;
+        opacity: 0.5;
+    }
+
+    50% {
+        top: 90%;
+        opacity: 1;
+    }
 }
 
 .camera-instruction {
@@ -950,9 +959,17 @@ body {
 
 /* Capture flash animation */
 @keyframes capture-flash {
-    0% { opacity: 0; }
-    50% { opacity: 1; }
-    100% { opacity: 0; }
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 
 .camera-body.flash::after {
@@ -976,18 +993,277 @@ body {
         max-height: 100vh;
         border-radius: 0;
     }
-    
+
     .camera-body {
         flex: 1;
         height: auto;
     }
-    
+
     .capture-preview-strip {
         min-height: 80px;
     }
-    
+
     .capture-thumbnail img {
         width: 60px;
         height: 60px;
+    }
+}
+
+/* ============================================
+   COMPREHENSIVE MOBILE RESPONSIVE STYLES
+   ============================================ */
+
+@media (max-width: 480px) {
+
+    /* Root and Body */
+    .factory-layout {
+        padding: 0.5rem;
+    }
+
+    /* Header - Stack vertically on small screens */
+    .factory-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+        padding: 0.75rem 0;
+    }
+
+    .factory-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .status-bar {
+        width: 100%;
+        justify-content: space-between;
+        gap: 0.5rem;
+        font-size: 0.7rem;
+    }
+
+    .status-item {
+        gap: 0.2rem;
+    }
+
+    .status-item svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* Dashboard Grid - Stack cards */
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    .stat-card {
+        padding: 0.75rem;
+    }
+
+    .stat-card h3 {
+        font-size: 0.65rem;
+    }
+
+    .stat-card .value {
+        font-size: 1.2rem;
+    }
+
+    /* Chart spans full width */
+    .stat-card.wide-card {
+        grid-column: 1 / -1;
+    }
+
+    /* Action Zone */
+    .action-zone {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+        min-height: auto;
+    }
+
+    /* Upload Area */
+    .upload-area {
+        padding: 1rem;
+        min-height: 150px;
+    }
+
+    .upload-content h3 {
+        font-size: 0.85rem;
+    }
+
+    .upload-content p {
+        font-size: 0.7rem;
+    }
+
+    /* Queue Panel */
+    .queue-panel {
+        min-height: 100px;
+    }
+
+    /* Results Panel */
+    .results-panel {
+        overflow-x: auto;
+    }
+
+    .results-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        font-size: 0.75rem;
+    }
+
+    .results-table th,
+    .results-table td {
+        padding: 0.5rem 0.35rem;
+        font-size: 0.7rem;
+    }
+
+    /* Hide less important columns on mobile */
+    .results-table th:nth-child(5),
+    .results-table td:nth-child(5),
+    .results-table th:nth-child(6),
+    .results-table td:nth-child(6) {
+        display: none;
+    }
+
+    /* Buttons */
+    .factory-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.75rem;
+    }
+
+    /* Chat FAB - Move above other elements */
+    #chat-fab {
+        bottom: 70px;
+        right: 15px;
+        width: 50px;
+        height: 50px;
+        z-index: 900;
+    }
+
+    /* Chat Panel - Full width on mobile */
+    #chat-panel {
+        width: calc(100vw - 20px);
+        right: 10px;
+        bottom: 130px;
+        max-height: 50vh;
+    }
+
+    /* Modals */
+    .modal-content {
+        width: 95vw;
+        max-width: 95vw;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-header h3 {
+        font-size: 0.9rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .form-group label {
+        font-size: 0.75rem;
+    }
+
+    .form-group input,
+    .form-group select {
+        font-size: 0.85rem;
+        padding: 0.6rem;
+    }
+
+    /* Camera Modal Footer */
+    .camera-footer {
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .capture-count {
+        font-size: 0.75rem;
+    }
+
+    .capture-btn {
+        width: 60px;
+        height: 60px;
+    }
+
+    .capture-btn-inner {
+        width: 48px;
+        height: 48px;
+    }
+
+    /* Camera controls */
+    .camera-controls {
+        gap: 0.5rem;
+    }
+
+    .camera-controls button {
+        padding: 0.4rem;
+    }
+
+    /* Zoom control */
+    .zoom-control {
+        bottom: 100px;
+    }
+}
+
+/* Even smaller screens (iPhone SE, etc.) */
+@media (max-width: 375px) {
+    .factory-header h1 {
+        font-size: 1rem;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card .value {
+        font-size: 1rem;
+    }
+
+    .upload-area {
+        min-height: 120px;
+    }
+
+    .results-table th,
+    .results-table td {
+        padding: 0.4rem 0.25rem;
+        font-size: 0.65rem;
+    }
+
+    /* Hide more columns on very small screens */
+    .results-table th:nth-child(4),
+    .results-table td:nth-child(4) {
+        display: none;
+    }
+
+    #chat-fab {
+        bottom: 80px;
+        right: 10px;
+        width: 45px;
+        height: 45px;
+    }
+}
+
+/* Landscape mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    .camera-content {
+        flex-direction: row;
+    }
+
+    .camera-body {
+        flex: 1;
+    }
+
+    .camera-footer {
+        flex-direction: column;
+        width: auto;
+        height: 100%;
+    }
+
+    .capture-preview-strip {
+        flex-direction: column;
+        width: 80px;
+        height: auto;
     }
 }
