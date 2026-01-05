@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice.AI | Smart Extraction</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Gemini SDK (using import map for module support if needed, but we'll use raw fetch for simplicity in vanilla) -->
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="factory-header">
+            <div class="logo">
+                <i data-lucide="box"></i>
+                <span>INVOICE.AI</span>
+            </div>
+            <div class="status-bar">
+                <span class="status-item"><i data-lucide="wifi"></i> ONLINE</span>
+                <span class="status-item" id="api-status"><i data-lucide="cpu"></i> API: READY</span>
+            </div>
+            <button id="settings-btn" class="icon-btn"><i data-lucide="settings"></i></button>
+        </header>
+
+        <!-- Main Content -->
+        <main class="factory-main">
+            <!-- Dashboard / Stats -->
+            <section class="dashboard-grid">
+                <div class="stat-card">
+                    <h3>TOTAL SPEND</h3>
+                    <div class="value" id="total-spend">$0.00</div>
+                </div>
+                <div class="stat-card">
+                    <h3>INVOICES</h3>
+                    <div class="value" id="total-invoices">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>DUPLICATES</h3>
+                    <div class="value warning" id="total-duplicates">0</div>
+                </div>
+                <div class="stat-card wide-card">
+                    <h3>DAILY TREND</h3>
+                    <div class="chart-container">
+                        <canvas id="daily-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Zone -->
+            <section class="action-zone">
+                <div class="upload-area" id="drop-zone">
+                    <input type="file" id="file-input" multiple accept="image/*" hidden>
+                    <div class="upload-content">
+                        <i data-lucide="upload-cloud" class="upload-icon"></i>
+                        <h3>DROP INVOICES HERE</h3>
+                        <p>or click to browse</p>
+                    </div>
+                    <button id="camera-trigger" class="factory-btn secondary"><i data-lucide="camera"></i>
+                        CAMERA</button>
+                </div>
+
+                <div class="queue-panel">
+                    <div class="panel-header">
+                        <h3>PROCESSING QUEUE</h3>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <span class="badge success-outline" style="font-size: 0.7rem;">BATCH SAVINGS ACTIVE</span>
+                            <span class="badge" id="queue-count">0</span>
+                        </div>
+                    </div>
+                    <div class="queue-list" id="queue-list">
+                        <!-- Queue items will go here -->
+                        <div class="empty-state">No images in queue</div>
+                    </div>
+                    <button id="process-btn" class="factory-btn primary" disabled>
+                        <i data-lucide="zap"></i> PROCESS BATCH
+                    </button>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section">
+                <div class="section-header">
+                    <h2>INVOICE TOTALS</h2>
+                    <div class="actions" style="display: flex; gap: 1rem;">
+                        <button id="clear-btn" class="factory-btn danger-outline">CLEAR ALL</button>
+                        <button id="export-btn" class="factory-btn success-outline"><i data-lucide="download"></i>
+                            EXPORT CSV</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="factory-table">
+                        <thead>
+                            <tr>
+                                <th>STATUS</th>
+                                <th>DATE</th>
+                                <th>INVOICE #</th>
+                                <th>VENDOR</th>
+                                <th>CATEGORY</th>
+                                <th>DESCRIPTION</th>
+                                <th>QTY</th>
+                                <th>COST</th>
+                                <th>TOTAL</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body">
+                            <!-- Results will go here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <!-- Camera Modal (Enhanced) -->
+        <div id="camera-modal" class="modal hidden">
+            <div class="modal-content camera-content">
+                <div class="modal-header camera-header">
+                    <h3><i data-lucide="scan-line"></i> SCAN INVOICE</h3>
+                    <div class="camera-controls-top">
+                        <button class="icon-btn" id="flash-toggle" title="Toggle Flash">
+                            <i data-lucide="zap-off"></i>
+                        </button>
+                        <button class="icon-btn" id="switch-camera" title="Switch Camera">
+                            <i data-lucide="refresh-cw"></i>
+                        </button>
+                        <button class="close-btn" id="close-camera"><i data-lucide="x"></i></button>
+                    </div>
+                </div>
+                <div class="camera-body">
+                    <video id="camera-feed" autoplay playsinline></video>
+                    <div class="camera-overlay">
+                        <div class="scan-area">
+                            <div class="corner top-left"></div>
+                            <div class="corner top-right"></div>
+                            <div class="corner bottom-left"></div>
+                            <div class="corner bottom-right"></div>
+                            <div class="scan-line"></div>
+                        </div>
+                    </div>
+                    <div class="camera-instruction">
+                        <i data-lucide="move"></i> Align document within frame
+                    </div>
+                    <canvas id="camera-canvas" hidden></canvas>
+
+                    <!-- Zoom Slider -->
+                    <div class="zoom-control">
+                        <i data-lucide="zoom-out"></i>
+                        <input type="range" id="zoom-slider" min="1" max="3" step="0.1" value="1">
+                        <i data-lucide="zoom-in"></i>
+                    </div>
+                </div>
+
+                <!-- Capture Preview Strip -->
+                <div class="capture-preview-strip" id="capture-strip">
+                    <!-- Thumbnails will be added here -->
+                </div>
+
+                <div class="modal-footer camera-footer">
+                    <div class="capture-count">
+                        <span id="capture-count-num">0</span> captured
+                    </div>
+                    <button class="capture-btn" id="capture-btn">
+                        <div class="capture-btn-inner"></div>
+                    </button>
+                    <button class="factory-btn primary" id="done-capturing" disabled>
+                        DONE <i data-lucide="check"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i data-lucide="settings"></i> AZURE OPENAI SETTINGS</h3>
+                    <button class="close-btn" id="close-settings"><i data-lucide="x"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>AZURE OPENAI ENDPOINT</label>
+                        <input type="text" id="azure-endpoint-input"
+                            placeholder="https://your-resource.openai.azure.com/"
+                            value="https://spendwise-openai-23272.openai.azure.com/">
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>AZURE OPENAI API KEY</label>
+                        <input type="password" id="api-key-input" placeholder="Enter your Azure OpenAI API Key">
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>DEPLOYMENT NAME</label>
+                        <input type="text" id="deployment-name-input" placeholder="gpt-4o-mini" value="gpt-4o-mini">
+                    </div>
+                    <div class="form-group"
+                        style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                        <label>TOKEN USAGE (LIFETIME)</label>
+                        <div
+                            style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.9rem;">
+                            <span>INPUT: <strong id="token-input" style="color: var(--accent-primary)">0</strong></span>
+                            <span>OUTPUT: <strong id="token-output"
+                                    style="color: var(--accent-secondary)">0</strong></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="factory-btn primary" id="save-settings">SAVE CONFIG</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Edit Invoice Modal -->
+    <div id="edit-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>EDIT INVOICE</h3>
+                <button class="close-btn" id="close-edit"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label>INVOICE NUMBER</label>
+                    <input type="text" id="edit-number">
+                </div>
+                <div class="form-group">
+                    <label>DATE (YYYY-MM-DD)</label>
+                    <input type="text" id="edit-date">
+                </div>
+                <div class="form-group">
+                    <label>VENDOR</label>
+                    <input type="text" id="edit-vendor">
+                </div>
+                <div class="form-group">
+                    <label>TOTAL AMOUNT</label>
+                    <input type="number" step="0.01" id="edit-amount">
+                </div>
+                <div class="form-group">
+                    <label>CATEGORY</label>
+                    <input type="text" id="edit-category">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="factory-btn primary" id="save-edit">UPDATE INVOICE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Agent -->
+    <button id="chat-fab" class="chat-fab">
+        <i data-lucide="message-square"></i>
+    </button>
+
+    <div id="chat-panel" class="chat-panel hidden">
+        <div class="chat-header">
+            <h3><i data-lucide="bot"></i> INVOICE AGENT</h3>
+            <button id="close-chat" class="icon-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message ai">
+                Hello! I can analyze your invoices. Ask me anything or use a quick prompt below.
+            </div>
+        </div>
+        <div class="quick-prompts">
+            <button class="prompt-chip" onclick="sendPrompt('Analyze my spending trends')">Spending Trends</button>
+            <button class="prompt-chip" onclick="sendPrompt('Identify potential savings')">Potential Savings</button>
+            <button class="prompt-chip" onclick="sendPrompt('Flag unusual transactions')">Unusual Items</button>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Ask a question...">
+            <button id="send-chat" class="icon-btn primary"><i data-lucide="send"></i></button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="utils.js"></script>
+    <script src="azureOpenAI.js"></script>
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

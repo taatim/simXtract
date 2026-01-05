@@ -1,0 +1,14 @@
+# Ignore for SWA deployment
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.duckdb
+*.duckdb.wal
+.git/
+.DS_Store
+._*
+docker_build_context/
+*.log
+node_modules/

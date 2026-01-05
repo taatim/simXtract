@@ -1,0 +1,27 @@
+# Git
+.git
+.gitignore
+._.git
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+venv
+.venv
+*.egg-info
+
+# Mac
+.DS_Store
+._*
+
+# Docker context (avoid recursion)
+docker_build_context
+
+# Database files (will be created fresh in container)
+*.duckdb
+*.duckdb.wal
+
+# IDE
+.vscode
+.idea

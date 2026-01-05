@@ -1,0 +1,36 @@
+# Dependencies
+venv/
+.venv/
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Environment & Secrets
+.env
+.env.local
+*.env
+
+# Database files
+*.duckdb
+*.duckdb.wal
+
+# macOS
+.DS_Store
+._*
+
+# IDE
+.vscode/
+.idea/
+
+# Docker context (avoid pushing duplicates)
+docker_build_context/
+
+# Build artifacts
+dist/
+build/
+*.log
+
+# Local development
+*.local

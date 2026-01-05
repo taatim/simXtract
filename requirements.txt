@@ -1,0 +1,6 @@
+streamlit
+google-generativeai
+duckdb
+pandas
+pillow
+typing_extensions
