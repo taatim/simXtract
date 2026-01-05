@@ -53,7 +53,6 @@ let stream = null;
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
     setupEventListeners();
-    initChart();
     loadSettings();
     lucide.createIcons();
 });
@@ -69,7 +68,6 @@ async function loadData() {
 
         renderResults();
         updateDashboard(stats);
-        updateChartData(stats.daily_trend);
     } catch (e) {
         console.error("Failed to load data:", e);
         window.appState.invoices = [];
@@ -81,20 +79,7 @@ function computeStats(invoices) {
     const total_spend = nonDuplicates.reduce((sum, inv) => sum + (inv.total_amount || 0), 0);
     const duplicates = invoices.filter(inv => inv.is_duplicate).length;
 
-    // Group by date for trend
-    const byDate = {};
-    nonDuplicates.forEach(inv => {
-        if (inv.date) {
-            byDate[inv.date] = (byDate[inv.date] || 0) + (inv.total_amount || 0);
-        }
-    });
-
-    const daily_trend = Object.entries(byDate)
-        .map(([date, total_amount]) => ({ date, total_amount }))
-        .sort((a, b) => b.date.localeCompare(a.date))
-        .slice(0, 7);
-
-    return { total_spend, count: invoices.length, duplicates, daily_trend };
+    return { total_spend, count: invoices.length, duplicates };
 }
 
 function saveInvoices() {
@@ -143,8 +128,6 @@ function updateDashboard(stats) {
     } else {
         els.duplicateCount.classList.remove('warning');
     }
-
-    updateChartData(stats.daily_trend);
 }
 
 // --- Core Logic ---
@@ -376,13 +359,19 @@ function renderQueue() {
     const count = window.appState.queue.length;
     els.queueCount.textContent = count;
 
+    // Toggle Visibility
+    const container = document.getElementById('queue-panel-container');
+    if (container) {
+        if (count > 0) container.classList.remove('hidden');
+        else container.classList.add('hidden');
+    }
+
     const minBatch = 1;
     const remaining = minBatch - count;
 
     if (count === 0) {
         els.processBtn.disabled = true;
         els.processBtn.innerHTML = '<i data-lucide="zap"></i> PROCESS BATCH';
-        els.queueList.innerHTML = '<div class="empty-state">No images in queue</div>';
         return;
     }
 
@@ -436,59 +425,7 @@ function renderResults() {
     lucide.createIcons();
 }
 
-// --- Chart Logic ---
 
-function initChart() {
-    try {
-        if (typeof Chart === 'undefined') {
-            console.warn('Chart.js not loaded');
-            return;
-        }
-        const ctx = els.chartCanvas.getContext('2d');
-        Chart.defaults.color = '#888';
-        Chart.defaults.borderColor = '#333';
-
-        dailyChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Daily Spend',
-                    data: [],
-                    backgroundColor: '#ff6b00',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#333' } },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
-    } catch (e) {
-        console.error("Chart Init Error:", e);
-    }
-}
-
-function updateChartData(trendData) {
-    try {
-        if (!dailyChart || !trendData) return;
-
-        // trendData is array of {date: "YYYY-MM-DD", total_amount: 123}
-        const labels = trendData.map(d => d.date);
-        const values = trendData.map(d => d.total_amount);
-
-        dailyChart.data.labels = labels;
-        dailyChart.data.datasets[0].data = values;
-        dailyChart.update();
-    } catch (e) {
-        console.error("Chart Update Error:", e);
-    }
-}
 
 // --- Camera Logic (Enhanced) ---
 

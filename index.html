@@ -30,16 +30,49 @@
                 <span>INVOICE.AI</span>
             </div>
             <div class="status-bar">
-                <span class="status-item"><i data-lucide="wifi"></i> ONLINE</span>
-                <span class="status-item" id="api-status"><i data-lucide="cpu"></i> API: READY</span>
+                <span class="status-item"><i data-lucide="wifi"></i></span>
+                <span class="status-item" id="api-status"><i data-lucide="cpu"></i></span>
             </div>
             <button id="settings-btn" class="icon-btn"><i data-lucide="settings"></i></button>
         </header>
 
         <!-- Main Content -->
         <main class="factory-main">
-            <!-- Dashboard / Stats -->
-            <section class="dashboard-grid">
+            <!-- Action Zone (Hero) -->
+            <section class="action-zone featured-actions">
+                <input type="file" id="file-input" multiple accept="image/*" hidden>
+
+                <div class="hero-buttons">
+                    <button id="camera-trigger" class="factory-btn primary hero-btn">
+                        <i data-lucide="camera" style="width: 32px; height: 32px;"></i>
+                        <span style="font-size: 1.2rem; font-weight: 800;">SCAN RECEIPT</span>
+                    </button>
+
+                    <button id="upload-trigger" class="factory-btn secondary"
+                        onclick="document.getElementById('file-input').click()">
+                        <i data-lucide="upload-cloud"></i> UPLOAD FILE
+                    </button>
+                </div>
+
+                <!-- Queue Panel (Hidden by default) -->
+                <div class="queue-panel hidden" id="queue-panel-container">
+                    <div class="panel-header">
+                        <h3>PROCESSING QUEUE</h3>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <span class="badge" id="queue-count">0</span>
+                        </div>
+                    </div>
+                    <div class="queue-list" id="queue-list">
+                        <!-- Queue items will go here -->
+                    </div>
+                    <button id="process-btn" class="factory-btn primary" disabled>
+                        <i data-lucide="zap"></i> PROCESS BATCH
+                    </button>
+                </div>
+            </section>
+
+            <!-- Dashboard / Stats (Secondary) -->
+            <section class="dashboard-grid compact-stats">
                 <div class="stat-card">
                     <h3>TOTAL SPEND</h3>
                     <div class="value" id="total-spend">$0.00</div>
@@ -52,55 +85,16 @@
                     <h3>DUPLICATES</h3>
                     <div class="value warning" id="total-duplicates">0</div>
                 </div>
-                <div class="stat-card wide-card">
-                    <h3>DAILY TREND</h3>
-                    <div class="chart-container">
-                        <canvas id="daily-chart"></canvas>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Action Zone -->
-            <section class="action-zone">
-                <div class="upload-area" id="drop-zone">
-                    <input type="file" id="file-input" multiple accept="image/*" hidden>
-                    <div class="upload-content">
-                        <i data-lucide="upload-cloud" class="upload-icon"></i>
-                        <h3>UPLOAD INVOICES</h3>
-                        <p>Drop files or click to browse</p>
-                    </div>
-                    <div class="divider-text" style="margin: 1rem 0; font-size: 0.8rem; color: #666;">- OR -</div>
-                    <button id="camera-trigger" class="factory-btn secondary">
-                        <i data-lucide="camera"></i> SCAN WITH CAMERA
-                    </button>
-                </div>
-
-                <div class="queue-panel">
-                    <div class="panel-header">
-                        <h3>PROCESSING QUEUE</h3>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <span class="badge success-outline" style="font-size: 0.7rem;">BATCH SAVINGS ACTIVE</span>
-                            <span class="badge" id="queue-count">0</span>
-                        </div>
-                    </div>
-                    <div class="queue-list" id="queue-list">
-                        <!-- Queue items will go here -->
-                        <div class="empty-state">No images in queue</div>
-                    </div>
-                    <button id="process-btn" class="factory-btn primary" disabled>
-                        <i data-lucide="zap"></i> PROCESS BATCH
-                    </button>
-                </div>
             </section>
 
             <!-- Results Section -->
             <section class="results-section">
                 <div class="section-header">
-                    <h2>INVOICE TOTALS</h2>
+                    <h2>RECENT INVOICES</h2>
                     <div class="actions" style="display: flex; gap: 1rem;">
-                        <button id="clear-btn" class="factory-btn danger-outline">CLEAR ALL</button>
-                        <button id="export-btn" class="factory-btn success-outline"><i data-lucide="download"></i>
-                            EXPORT CSV</button>
+                        <button id="clear-btn" class="factory-btn danger-outline">CLEAR</button>
+                        <button id="export-btn" class="factory-btn success-outline"><i
+                                data-lucide="download"></i></button>
                     </div>
                 </div>
                 <div class="table-container">
