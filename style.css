@@ -1165,29 +1165,116 @@ body {
     }
 
     /* Results Panel */
+    /* Results Panel - Card View for Mobile */
     .results-panel {
-        overflow-x: auto;
+        overflow-x: visible;
     }
 
-    .results-table {
+    .factory-table {
         display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-        font-size: 0.75rem;
     }
 
-    .results-table th,
-    .results-table td {
-        padding: 0.5rem 0.35rem;
-        font-size: 0.7rem;
-    }
-
-    /* Hide less important columns on mobile */
-    .results-table th:nth-child(5),
-    .results-table td:nth-child(5),
-    .results-table th:nth-child(6),
-    .results-table td:nth-child(6) {
+    .factory-table thead {
         display: none;
+    }
+
+    .factory-table tbody {
+        display: block;
+    }
+
+    .factory-table tr {
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-card);
+        border: none;
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 1rem;
+        padding: 1rem;
+    }
+
+    .factory-table td {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border: none;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.9rem;
+        /* READABLE SIZE */
+        text-align: right;
+    }
+
+    .factory-table td:last-child {
+        border-bottom: none;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+
+    /* Add labels via CSS */
+    .factory-table td:nth-child(1)::before {
+        content: "Status";
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .factory-table td:nth-child(2)::before {
+        content: "Date";
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .factory-table td:nth-child(3)::before {
+        content: "Invoice #";
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .factory-table td:nth-child(4)::before {
+        content: "Vendor";
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .factory-table td:nth-child(5)::before {
+        content: "Category";
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .factory-table td:nth-child(6)::before {
+        content: "Description";
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .factory-table td:nth-child(7)::before {
+        content: "Qty";
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .factory-table td:nth-child(8)::before {
+        content: "Cost";
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .factory-table td:nth-child(9)::before {
+        content: "Total";
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .factory-table td:nth-child(10)::before {
+        content: "Actions";
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    /* Show all columns in card view */
+    .results-table th:nth-child(n),
+    .results-table td:nth-child(n) {
+        display: flex !important;
     }
 
     /* Buttons */
@@ -1292,17 +1379,7 @@ body {
         min-height: 120px;
     }
 
-    .results-table th,
-    .results-table td {
-        padding: 0.4rem 0.25rem;
-        font-size: 0.65rem;
-    }
 
-    /* Hide more columns on very small screens */
-    .results-table th:nth-child(4),
-    .results-table td:nth-child(4) {
-        display: none;
-    }
 
     #chat-fab {
         bottom: 80px;
