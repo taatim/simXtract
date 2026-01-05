@@ -101,12 +101,36 @@ function saveInvoices() {
     localStorage.setItem('simxtract_invoices', JSON.stringify(window.appState.invoices));
 }
 
+function normalizeVendor(vendor) {
+    if (!vendor) return '';
+    // Normalize vendor name: lowercase, trim, remove common suffixes
+    return vendor.toLowerCase()
+        .trim()
+        .replace(/\s+(inc|llc|ltd|corp|corporation|company|co|store|#\d+)\.?$/i, '')
+        .replace(/\s+/g, ' ');
+}
+
 function checkDuplicate(data) {
-    return window.appState.invoices.some(inv =>
-        inv.vendor === data.vendor &&
-        inv.total_amount === data.total_amount &&
-        inv.date === data.date
-    );
+    const newVendor = normalizeVendor(data.vendor);
+    const newAmount = parseFloat(data.total_amount) || 0;
+    const newDate = data.date || '';
+
+    return window.appState.invoices.some(inv => {
+        const existingVendor = normalizeVendor(inv.vendor);
+        const existingAmount = parseFloat(inv.total_amount) || 0;
+        const existingDate = inv.date || '';
+
+        // Exact vendor match (normalized)
+        const vendorMatch = existingVendor === newVendor;
+
+        // Amount match (within 1 cent tolerance)
+        const amountMatch = Math.abs(existingAmount - newAmount) < 0.02;
+
+        // Date match (if both have dates)
+        const dateMatch = newDate && existingDate ? existingDate === newDate : true;
+
+        return vendorMatch && amountMatch && dateMatch;
+    });
 }
 
 function updateDashboard(stats) {

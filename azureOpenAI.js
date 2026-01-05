@@ -15,21 +15,42 @@ const AZURE_OPENAI_API_VERSION = '2024-02-15-preview';
 async function callAzureOpenAI(base64Image, apiKey, endpoint, deploymentName = 'gpt-4o-mini') {
     const url = `${endpoint}/openai/deployments/${deploymentName}/chat/completions?api-version=${AZURE_OPENAI_API_VERSION}`;
 
-    const prompt = `Analyze this invoice image and extract the following data into a strict JSON object:
+    const prompt = `You are an expert invoice/receipt OCR system. Analyze this image and extract structured data.
 
-1. **invoice_number**: The unique invoice identifier. Remove any "Inv-" or "No." prefixes. If missing, return null.
-2. **date**: The invoice date in YYYY-MM-DD format.
-3. **vendor**: The canonical name of the vendor (e.g., "Shell" instead of "Shell Station 1234").
-4. **category**: Choose ONE: [Hardware, Software, Office Supplies, Services, Travel, Utilities, Meals, Other].
-5. **description**: A brief summary of the main purchase (e.g., "Office Chairs" or "AWS Hosting").
-6. **qty**: The quantity of the main item (default to 1).
-7. **unit_cost**: The cost per unit.
-8. **total_amount**: The final total including tax.
+STEP 1: Look for the DATE on the invoice/receipt. Common locations:
+- Top right corner
+- Near the invoice number
+- Header area
+- Transaction timestamp
 
-CRITICAL:
-- Return ONLY valid JSON. No markdown code blocks.
-- If 'total_amount' is missing, calculate it (qty * unit_cost).
-- If 'description' is ambiguous, infer it from the vendor (e.g., Uber -> "Ride Share").`;
+DATE FORMATS to recognize and convert to YYYY-MM-DD:
+- "Jan 5, 2025" → "2025-01-05"
+- "1/5/2025" or "01/05/2025" → "2025-01-05"
+- "5/1/2025" (DD/MM/YYYY) → "2025-01-05"
+- "2025-01-05" → keep as is
+- "January 5th, 2025" → "2025-01-05"
+
+STEP 2: Extract vendor name (the business that issued the invoice).
+
+STEP 3: Find the total amount (look for "Total", "Grand Total", "Amount Due", "Balance").
+
+STEP 4: Return this exact JSON structure (no markdown, no extra text):
+{
+  "invoice_number": "string or null",
+  "date": "YYYY-MM-DD format (REQUIRED - look carefully)",
+  "vendor": "Business name (simplified, e.g. 'Starbucks' not 'Starbucks Store #12345')",
+  "category": "One of: Hardware, Software, Office Supplies, Services, Travel, Utilities, Meals, Other",
+  "description": "Brief summary of purchase",
+  "qty": 1,
+  "unit_cost": 0.00,
+  "total_amount": 0.00
+}
+
+IMPORTANT:
+- The DATE field is critical - search the entire image carefully
+- If you see multiple dates, use the transaction/invoice date (not print date)
+- Return ONLY the JSON object, nothing else
+- total_amount should be a number (no $ symbol)`;
 
     const response = await fetch(url, {
         method: 'POST',
