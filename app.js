@@ -581,29 +581,31 @@ function finishCapturing() {
     const count = cameraCaptures.length;
     if (count === 0) return;
 
-    // Add all captures to queue
-    cameraCaptures.forEach(capture => {
-        const file = new File([capture.blob], `capture_${Date.now()}.jpg`, { type: "image/jpeg" });
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            addToQueue({
-                id: Date.now() + Math.random(),
-                file: file,
-                preview: e.target.result,
-                base64: e.target.result.split(',')[1]
-            });
-        };
-        reader.readAsDataURL(file);
-        URL.revokeObjectURL(capture.preview);
+    // Clone array to process safely
+    const captures = [...cameraCaptures];
+
+    // Add to queue logic (Synchronous)
+    captures.forEach(capture => {
+        // We use the existing blob and preview URL directly
+        // Note: We do NOT revoke the object URL here because it's used in the queue display
+        addToQueue({
+            id: Date.now() + Math.random(),
+            file: new File([capture.blob], `capture_${Date.now()}.jpg`, { type: "image/jpeg" }),
+            preview: capture.preview
+        });
     });
 
     closeCamera();
-    alert(`Saved ${count} images to Queue. Click 'PROCESS BATCH' when ready.`);
 
-    // Scroll to queue
+    // Show confirmation and scroll
+    // We delay slightly to allow DOM to update (unhide queue)
     setTimeout(() => {
-        document.querySelector('.queue-panel').scrollIntoView({ behavior: 'smooth' });
-    }, 300);
+        const queueContainer = document.getElementById('queue-panel-container');
+        if (queueContainer) {
+            queueContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Highlight effect ?
+        }
+    }, 100);
 }
 
 
