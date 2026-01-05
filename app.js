@@ -600,12 +600,13 @@ function finishCapturing() {
     // Show confirmation and scroll
     // We delay slightly to allow DOM to update (unhide queue)
     setTimeout(() => {
-        const queueContainer = document.getElementById('queue-panel-container');
-        if (queueContainer) {
-            queueContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            // Highlight effect ?
+        const processBtn = document.getElementById('process-btn');
+        if (processBtn) {
+            processBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // ensure queue container is visible (redundant check)
+            document.getElementById('queue-panel-container')?.classList.remove('hidden');
         }
-    }, 100);
+    }, 200);
 }
 
 
