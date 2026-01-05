@@ -507,11 +507,13 @@ async function openCamera() {
 async function startCamera() {
     if (stream) stream.getTracks().forEach(track => track.stop());
     try {
+        // Request landscape-oriented camera (better for receipts)
         stream = await navigator.mediaDevices.getUserMedia({
             video: {
                 facingMode: currentFacingMode,
-                width: { ideal: 1920 },
-                height: { ideal: 1080 }
+                width: { ideal: 1920, min: 1280 },
+                height: { ideal: 1080, min: 720 },
+                aspectRatio: { ideal: 16 / 9 }
             }
         });
         els.cameraFeed.srcObject = stream;
@@ -639,6 +641,9 @@ function removeCapture(index) {
 }
 
 function finishCapturing() {
+    const count = cameraCaptures.length;
+    if (count === 0) return;
+
     // Add all captures to queue
     cameraCaptures.forEach(capture => {
         const file = new File([capture.blob], `capture_${Date.now()}.jpg`, { type: "image/jpeg" });
@@ -656,7 +661,14 @@ function finishCapturing() {
     });
 
     closeCamera();
+    alert(`Saved ${count} images to Queue. Click 'PROCESS BATCH' when ready.`);
+
+    // Scroll to queue
+    setTimeout(() => {
+        document.querySelector('.queue-panel').scrollIntoView({ behavior: 'smooth' });
+    }, 300);
 }
+
 
 // --- Chat Agent ---
 
