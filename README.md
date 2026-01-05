@@ -1,16 +1,16 @@
-<![CDATA[<div align="center">
+<div align="center">
 
-# 📄 simXtract
+# 📄 Invoice.AI (simXtract)
 
-**AI-Powered Invoice Extraction & Analysis**
+**Serverless, AI-Powered Receipt & Invoice Extraction**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![Gemini AI](https://img.shields.io/badge/Gemini-AI-orange.svg)](https://ai.google.dev/)
+[![Azure Static Web Apps](https://img.shields.io/badge/Azure-Static_Web_Apps-blueviolet)](https://azure.microsoft.com/en-us/services/app-service/static/)
+[![Azure OpenAI](https://img.shields.io/badge/AI-Azure%20OpenAI-0078D4)](https://azure.microsoft.com/)
 
-*Transform invoices into structured data with the power of Gemini AI*
+*Turn receipts into structured data instantly using Client-Side AI.*
 
-[Features](#features) • [Quick Start](#quick-start) • [Usage](#usage) • [API](#api) • [Docker](#docker)
+[Features](#-features) • [Getting Started](#-getting-started) • [Usage](#-usage) • [Architecture](#-architecture)
 
 ---
 
@@ -18,129 +18,71 @@
 
 ## ✨ Features
 
-- **📸 Multi-Input Capture** — Drag & drop, file upload, or live camera scanning
-- **🤖 AI-Powered Extraction** — Leverages Google Gemini for intelligent OCR and data structuring
-- **📊 Batch Processing** — Process multiple invoices concurrently with optimized API calls
-- **🔍 Duplicate Detection** — Smart deduplication prevents double-counting expenses
-- **💬 Invoice Agent** — Chat with your data using natural language queries
-- **📈 Analytics Dashboard** — Real-time spending trends and category breakdowns
-- **📤 Export Ready** — One-click CSV/Excel export for accounting systems
+- **📱 Mobile-First Scanning** — Optimized camera workflow with "Card View" for mobile devices.
+- **⚡ Serverless Architecture** — 100% Client-Side. No backend server required. Deploys to Azure Static Web Apps.
+- **🤖 Azure OpenAI Integration** — Leverages GPT-4o interaction for highly accurate data extraction.
+- **🔒 Privacy Focused** — Data stored locally in your browser (`localStorage`). API keys never leave your device (except to call Azure).
+- **🎨 Material Design** — Modern, clean Light Theme with intuitive interactions.
+- **📊 Instant Analytics** — Real-time tracking of expenses by category.
+- **📤 Export Ready** — One-click export to Excel (.xlsx) for accounting.
 
-## 🖥️ Quick Start
+## 🚀 Getting Started
 
-### Prerequisites
+Since this is a static web application, you don't need to install Python or Docker.
 
-- Python 3.11+
-- [Gemini API Key](https://aistudio.google.com/app/apikey)
+### Option 1: Run Locally
 
-### Installation
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/taatim/simXtract.git
+    cd simXtract
+    ```
 
-```bash
-# Clone the repository
-git clone https://github.com/taatim/simXtract.git
-cd simXtract
+2.  **Open `index.html`**
+    - You can open `index.html` directly in your browser.
+    - *Recommended:* Use a simple HTTP server (e.g., Live Server in VS Code) to avoid CORS issues with camera access.
+    ```bash
+    npx http-server .
+    ```
 
-# Run the startup script (creates venv & installs deps)
-./start.sh
-```
+### Option 2: Deploy to Azure
 
-The app will be available at `http://localhost:8000`
+1.  **Fork this repo** to your GitHub.
+2.  **Create a Static Web App** in Azure Portal.
+3.  **Link to GitHub** and select this repo.
+4.  **No Build Preset** required (HTML/JS).
 
-### Manual Setup
+## 💡 Usage
 
-```bash
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
+1.  **<u>Configure API</u>**
+    - Click the **Settings (⚙️)** icon.
+    - Enter your **Azure OpenAI Endpoint** and **API Key**.
+    - *These are saved locally in your browser.*
 
-# Install dependencies
-pip install -r requirements.txt
+2.  **<u>Scan or Upload</u>**
+    - **Mobile:** Tap **"SCAN RECEIPT"** to launch the optimized camera. Snap multiple photos. Tap **"DONE"**.
+    - **Desktop:** Drag & drop receipt images onto the dashboard.
 
-# Start the server
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-```
+3.  **<u>Process Batch</u>**
+    - Click **"PROCESS BATCH"**. The AI will extract Vendor, Date, Total, and Category from all images.
 
-## 🚀 Usage
-
-1. **Configure API Key** — Click the ⚙️ settings icon and enter your Gemini API key
-2. **Upload Invoices** — Drag & drop images or use the camera to capture
-3. **Process Batch** — Click "Process Batch" to extract data from all queued images
-4. **Review & Edit** — Verify extracted data, edit if needed
-5. **Export** — Download as CSV for your accounting software
-
-## 🔌 API
-
-### Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/invoices` | List all invoices |
-| `POST` | `/api/invoices` | Create new invoice |
-| `PUT` | `/api/invoices/{id}` | Update invoice |
-| `DELETE` | `/api/invoices/{id}` | Delete invoice |
-| `GET` | `/api/stats` | Get dashboard statistics |
-| `POST` | `/api/chat` | Chat with invoice data |
-
-### Example Request
-
-```bash
-curl -X POST http://localhost:8000/api/invoices \
-  -H "Content-Type: application/json" \
-  -d '{
-    "invoice_number": "INV-001",
-    "date": "2024-01-15",
-    "vendor": "Office Depot",
-    "category": "Office Supplies",
-    "total_amount": 149.99
-  }'
-```
-
-## 🐳 Docker
-
-### Build & Run
-
-```bash
-# Build the image
-docker build -t simxtract .
-
-# Run the container
-docker run -p 8000:8000 simxtract
-```
-
-### Docker Compose (Coming Soon)
-
-```yaml
-services:
-  simxtract:
-    build: .
-    ports:
-      - "8000:8000"
-    environment:
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-```
+4.  **<u>Export</u>**
+    - Use "EXPORT XLS" to download your data for expense reporting.
 
 ## 🏗️ Architecture
 
-```
+This project has evolved from a Python backend to a streamlined **Static Web App**:
+
+```text
 simXtract/
-├── main.py              # FastAPI server & routes
-├── database.py          # DuckDB persistence layer
-├── gemini_service.py    # Gemini AI integration
-├── index.html           # Single-page application
-├── app.js               # Frontend logic & state
-├── gemini.js            # Client-side Gemini calls
-├── style.css            # Industrial UI theme
-└── utils.js             # Helper utilities
+├── index.html           # Main Application Entry
+├── style.css            # Material Light Theme & Mobile Responsiveness
+├── app.js               # Core Logic (State, Camera, UI Rendering)
+├── azureOpenAI.js       # Client-side AI Extraction Logic
+└── utils.js             # Helpers (Currency formatting, dates)
 ```
 
-## 🛣️ Roadmap
-
-- [ ] Enhanced camera scanning UX
-- [ ] Document edge detection & auto-crop
-- [ ] Multi-currency support
-- [ ] Receipt vs Invoice classification
-- [ ] QuickBooks/Xero integration
-- [ ] Mobile-first PWA
+> **Note:** Legacy Python/Docker files have been archived to `legacy_v1/`.
 
 ## 📄 License
 
@@ -152,7 +94,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ by [taatim](https://github.com/taatim)**
 
-*Turning receipts into insights, one invoice at a time.*
-
 </div>
-]]>
